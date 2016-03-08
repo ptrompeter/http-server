@@ -1,6 +1,7 @@
 # _*_ Coding: utf-8 _*_
 
 import socket
+from sys import argv
 
 def client(message):
     infos = socket.getaddrinfo('127.0.0.1', 5050)
@@ -21,4 +22,5 @@ def client(message):
     return message
 
 if __name__ == '__main__':
-    client(u'I have written a message.')
+    script, message = argv
+    print(client(message))
