@@ -1,7 +1,5 @@
 # _*_ Coding: utf-8 _*_
 
-# _*_ Coding: utf-8 _*_
-
 import socket
 
 def server():
@@ -20,6 +18,8 @@ def listen_to(server):
         message = u""
         while not message_complete:
             part = conn.recv(buffer_length)
+            if part is '':
+                message_complete = True
             message += part.decode('utf8')
             if len(part) < buffer_length:
                 message_complete = True

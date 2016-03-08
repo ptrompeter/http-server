@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 import pytest
-import server
 import client
 
 BUFFER_LENGTH = 8
@@ -11,15 +11,15 @@ def test_short_buff():
 
 
 def test_long_buff():
-    test_str = u"a" * (BUFFER_LENGTH * 10)
+    test_str = u"a" * 1200
     assert client.client(test_str) == test_str
 
 
 def test_exact_buff():
-    test_str = u"Good day"  # 8 bytes
+    test_str = u"a" * (BUFFER_LENGTH * 3)
     assert client.client(test_str) == test_str
 
 
 def test_non_ascii():
-    test_str = u"ƒåncy ¥o"
+    test_str = u"Laȝamon was ihoten"
     assert client.client(test_str) == test_str

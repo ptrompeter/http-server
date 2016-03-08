@@ -1,4 +1,4 @@
-# _*_ Coding: utf-8 _*_
+# _*_ coding: utf-8 _*_
 
 import socket
 from sys import argv
@@ -15,6 +15,8 @@ def client(message):
     message = u''
     while not message_complete:
         part = client.recv(buffer_length)
+        if part == '':
+                message_complete = True
         message += part.decode('utf8')
         if len(part) < buffer_length:
             message_complete = True
