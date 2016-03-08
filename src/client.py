@@ -9,7 +9,7 @@ def client(message):
     # client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     client.connect(stream_info[-1])
     client.sendall(message.encode('utf8'))
-    buffer_length = 1024
+    buffer_length = 8
     message_complete = False
     message = u''
     while not message_complete:

@@ -15,7 +15,7 @@ def listen_to(server):
     try:
         server.listen(1)
         conn, addr = server.accept()
-        buffer_length = 1024
+        buffer_length = 8
         message_complete = False
         message = u""
         while not message_complete:
