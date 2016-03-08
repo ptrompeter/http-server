@@ -1,25 +1,11 @@
 # -*- coding: utf-8 -*-
 import pytest
 import client
+import server
 
-BUFFER_LENGTH = 8
-
-
-def test_short_buff():
-    short_buffer = u"word"  # 4 Bytes
-    assert client.client(short_buffer) == short_buffer
+def test_response_ok():
+    assert server.response_ok() == b'HTTP/1.1 200 OK\r\n\r\n'
 
 
-def test_long_buff():
-    test_str = u"a" * 1200
-    assert client.client(test_str) == test_str
-
-
-def test_exact_buff():
-    test_str = u"a" * (BUFFER_LENGTH * 3)
-    assert client.client(test_str) == test_str
-
-
-def test_non_ascii():
-    test_str = u"Laȝamon was ihoten"
-    assert client.client(test_str) == test_str
+def test_HTTP_response():
+    assert client.client(u"Some Message") == u"HTTP/1.1 200 OK\r\n\r\n"
