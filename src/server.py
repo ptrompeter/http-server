@@ -11,29 +11,27 @@ def server():
     server.bind(address)
     return server
 
-
 def listen_to(server):
     try:
         server.listen(1)
         conn, addr = server.accept()
         buffer_length = 1024
-        while server:
-            message_complete = False
-            message = u""
-            while not message_complete:
-                part = conn.recv(buffer_length)
-                message += part.decode('utf8')
-                if len(part) < buffer_length:
-                    message_complete = True
-            print(message_complete)
-            reply(server, message)
-    finally: 
-        server.close()
+        message_complete = False
+        message = u""
+        while not message_complete:
+            part = conn.recv(buffer_length)
+            message += part.decode('utf8')
+            if len(part) < buffer_length:
+                message_complete = True
+        print(message_complete)
+        print(message.encode('utf8'))
+        reply(conn, message)
+    finally:
+        conn.close()
 
-def reply(server, message):
-    server.sendall(message.encode('utf8'))
+def reply(conn, message):
+    conn.sendall(message.encode('utf8'))
 
 
 if __name__ == '__main__':
     listen_to(server())
-  
