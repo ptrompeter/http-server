@@ -21,11 +21,11 @@ def listen_to(server):
             message_complete = False
             message = u""
             while not message_complete:
-                part = conn.recv(buffer_length)
+                part = client.recv(buffer_length)
                 message += part.decode('utf8')
                 if len(part) < buffer_length:
                     message_complete = True
-            print(message_complete)
+            print(message)
             reply(server, message)
     finally: 
         server.close()

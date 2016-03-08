@@ -18,7 +18,7 @@ def listen_to(client):
     message_complete = False
     message = u''
     while not message_complete:
-        part = conn.recv(buffer_length)
+        part = client.recv(buffer_length)
         message += part.decode('utf8')
         if len(part) < buffer_length:
             message_complete = True
