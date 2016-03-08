@@ -9,11 +9,6 @@ def client(message):
     # client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     client.connect(stream_info[-1])
     client.sendall(message.encode('utf8'))
-    reply_msg = listen_to(client)
-    print(reply_msg)
-    client.close()
-
-def listen_to(client):
     buffer_length = 1024
     message_complete = False
     message = u''
@@ -22,6 +17,7 @@ def listen_to(client):
         message += part.decode('utf8')
         if len(part) < buffer_length:
             message_complete = True
+    client.close()
     return message
 
 if __name__ == '__main__':
