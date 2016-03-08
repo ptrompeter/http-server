@@ -15,23 +15,28 @@ def listen_to(server):
     try:
         server.listen(1)
         conn, addr = server.accept()
-        buffer_length = 1024
-        message_complete = False
-        message = u""
-        while not message_complete:
-            part = conn.recv(buffer_length)
-            message += part.decode('utf8')
-            if len(part) < buffer_length:
-                message_complete = True
-        print(message_complete)
-        print(message.encode('utf8'))
-        reply(conn, message)
-    finally:
-        conn.close()
+    except (KeyboardInterrupt UnboundLocalError):
+        print('Server Closed')
+        server.close()
+    buffer_length = 1024
+    message_complete = False
+    message = u""
+    while not message_complete:
+        part = conn.recv(buffer_length)
+        message += part.decode('utf8')
+        if len(part) < buffer_length:
+            message_complete = True
+    print(message_complete)
+    reply(conn, message)
+    conn.close()
 
 def reply(conn, message):
     conn.sendall(message.encode('utf8'))
 
 
 if __name__ == '__main__':
-    listen_to(server())
+    try:
+        while True:
+            listen_to(server())
+    except KeyboardInterrupt:
+        print('Server Closed')
