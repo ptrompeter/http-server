@@ -28,13 +28,15 @@ def listen_to(server):
         print(message.decode('utf8'))
         conn.sendall(response_ok())
         conn.close()
-    except (KeyboardInterrupt, UnboundLocalError):
+    except KeyboardInterrupt:
         try:
             conn.close()
-        finally:
-            print('\nServer Closed')
-            server.close()
-            quit()
+        except:
+            pass
+    finally:
+        print('\nServer Closed')
+        server.close()
+        quit()
 
 
 def reply(conn, message):
