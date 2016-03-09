@@ -8,4 +8,4 @@ def test_response_ok():
 
 
 def test_HTTP_response():
-    assert client.client(u"Some Message") == u"HTTP/1.1 200 OK\r\n\r\n"
+    assert len(client.client(u"Some Message").splitlines()) == 2
