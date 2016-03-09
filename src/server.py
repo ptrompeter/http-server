@@ -17,15 +17,15 @@ def listen_to(server):
         conn, addr = server.accept()
         buffer_length = 8
         message_complete = False
-        message = u""
+        message = b""
         while not message_complete:
             part = conn.recv(buffer_length)
             if part is '':
                 message_complete = True
-            message += part.decode('utf8')
+            message += part
             if len(part) < buffer_length:
                 message_complete = True
-        print(message.encode('utf8'))
+        print(message.decode('utf8'))
         conn.sendall(response_ok())
         conn.close()
     except (KeyboardInterrupt, UnboundLocalError):

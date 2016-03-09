@@ -11,16 +11,16 @@ def client(message):
     client.sendall(message.encode('utf8'))
     buffer_length = 8
     message_complete = False
-    message = u''
+    message = b''
     while not message_complete:
         part = client.recv(buffer_length)
         if part == '':
                 message_complete = True
-        message += part.decode('utf8')
+        message += part
         if len(part) < buffer_length:
             message_complete = True
     client.close()
-    return message
+    return message.decode('utf8')
 
 if __name__ == '__main__':
     script, message = argv
