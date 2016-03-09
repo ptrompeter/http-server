@@ -29,9 +29,12 @@ def listen_to(server):
         conn.sendall(response_ok())
         conn.close()
     except (KeyboardInterrupt, UnboundLocalError):
-        print('\nServer Closed')
-        server.close()
-        quit()
+        try:
+            conn.close()
+        finally:
+            print('\nServer Closed')
+            server.close()
+            quit()
 
 
 def reply(conn, message):
@@ -49,8 +52,5 @@ def response_error():
 
 
 if __name__ == '__main__':
-    try:
-        while True:
-            listen_to(server())
-    except KeyboardInterrupt:
-        print('Server Closed')
+    while True:
+        listen_to(server())
