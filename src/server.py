@@ -31,12 +31,10 @@ def listen_to(server):
     except KeyboardInterrupt:
         try:
             conn.close()
-        except:
-            pass
-    finally:
-        print('\nServer Closed')
-        server.close()
-        quit()
+        finally:
+            print('\nServer Closed')
+            server.close()
+            quit()
 
 
 def reply(conn, message):
