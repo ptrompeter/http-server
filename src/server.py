@@ -39,18 +39,17 @@ def listen_to(server):
 def parse_request(request):
     req_list = request.splitlines()
     header_list = req_list[:req_list.index('')]
-    if header_list[0][0:4] != 'GET':
+    print(header_list[0][:3])
+    if header_list[0][:3] != b'GET':
         raise AttributeError
-    if header_list[0][-8:] != 'HTTP/1.1':
+    if header_list[0][-8:] != b'HTTP/1.1':
         raise EnvironmentError
     for header in header_list[1:]:
-        if header[:5] == 'Host:':
+        if header[:5] == b'Host:':
             break
     else:
         raise NameError
     return header_list[0][4:-9]
-     
-
 
 
 def reply(conn, message):
