@@ -51,7 +51,7 @@ def listen_to(server):
 
 def parse_request(request):
     req_list = request.splitlines()
-    header_list = req_list[:req_list.index('')]
+    header_list = req_list[:req_list.index(b'')]
     if header_list[0][:3] != b'GET':
         raise AttributeError
     if header_list[0][-8:] != b'HTTP/1.1':
