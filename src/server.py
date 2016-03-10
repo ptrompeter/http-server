@@ -36,6 +36,21 @@ def listen_to(server):
             server.close()
             quit()
 
+def parse_request(request):
+    req_list = request.splitlines()
+    header_list = req_list[:req_list.index('')]
+    if header_list[0][0:4] != 'GET':
+        raise AttributeError
+    if header_list[0][-8:] != 'HTTP/1.1'
+        raise EnvironmentError
+    for header in header_list[1:]:
+        if header[:5] = 'Host:':
+            break
+    else:
+        raise NameError
+     
+
+
 
 def reply(conn, message):
     conn.sendall(message.encode('utf8'))
