@@ -26,8 +26,20 @@ def listen_to(server):
             if len(part) < buffer_length:
                 message_complete = True
         print(message.decode('utf8'))
-        conn.sendall(response_ok())
-        conn.close()
+        try:
+            conn.sendall(response_ok())
+            conn.sendall(parse_request(message))
+            conn.sendall(b'\r\n\r\n')
+        except AttributeError:  # Bad Request
+            conn.sendall(response_error(b'405', b'Method Not Allowed'))
+        except EnvironmentError:  # Wrong HTTP
+            conn.sendall(response_error(b'406', b'Not Acceptable'))
+        except NameError:  # No Host
+            conn.sendall(response_error(b'400', b'Bad Request'))
+        except Exception:  # Any other error
+            conn.sendall(response_error(b'500', b'Internal Server Error'))
+        finally:
+            conn.close()
     except KeyboardInterrupt:
         try:
             conn.close()
@@ -39,7 +51,6 @@ def listen_to(server):
 def parse_request(request):
     req_list = request.splitlines()
     header_list = req_list[:req_list.index('')]
-    print(header_list[0][:3])
     if header_list[0][:3] != b'GET':
         raise AttributeError
     if header_list[0][-8:] != b'HTTP/1.1':
@@ -61,9 +72,9 @@ def response_ok():
     return b'HTTP/1.1 200 OK\r\n\r\n'
 
 
-def response_error():
+def response_error(error_code, error_message):
     """return HTTP server error response."""
-    return b'HTTP/1.1 500 Internal Server Error'
+    return b'HTTP/1.1 {} {}\r\n\r\n'.format(error_code, error_message)
 
 
 if __name__ == '__main__':
