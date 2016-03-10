@@ -15,7 +15,10 @@ def test_response_ok():
 
 
 def test_HTTP_response():
-    assert len(client.client(u"Some Message").splitlines()) == 2
+    assert client.client(USR_MESSAGES[0]) == b'HTTP/1.1 200 OK\r\n\r\nsumjunkz\r\n\r\n'
+    assert client.client(USR_MESSAGES[1]) == b'HTTP/1.1 405 Method Not Allowed\r\n\r\n'
+    assert client.client(USR_MESSAGES[2]) == b'HTTP/1.1 406 Not Acceptable\r\n\r\n'
+    assert client.client(USR_MESSAGES[3]) == b'HTTP/1.1 400 Bad Request\r\n\r\n'
 
 #@pytest.mark.parametrize('a', USR_MESSAGES)
 def test_parse_good():

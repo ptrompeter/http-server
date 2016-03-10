@@ -27,8 +27,9 @@ def listen_to(server):
                 message_complete = True
         print(message.decode('utf8'))
         try:
+            sending_message = parse_request(message)
             conn.sendall(response_ok())
-            conn.sendall(parse_request(message))
+            conn.sendall(sending_message)
             conn.sendall(b'\r\n\r\n')
         except AttributeError:  # Bad Request
             conn.sendall(response_error(b'405', b'Method Not Allowed'))
