@@ -81,3 +81,12 @@ def test_resolve_uri_bad():
     with pytest.raises(IOError):
         server.resolve_uri(b'/badfile.txt')
 
+
+def test_html_maker():
+    test_response = b'<!DOCTYPE html><html><body>'
+    '<a href="webroot/images/JPEG_example.jpg>JPEG_example.jpg</a>'
+    '<a href="webroot/images/sample_1.png>sample_1.png</a>"'
+    '<a href="webroot/images/Sample_Scene_Balls.jpg>Sample_Scene_Balls.jpg</a>"'
+    '</body></hmtl>'
+    assert server.html_maker('webroot/images') == test_response
+
