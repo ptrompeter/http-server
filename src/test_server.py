@@ -83,5 +83,5 @@ def test_resolve_uri_bad():
 
 def test_html_maker():
     test_response = b'<!DOCTYPE html><html><body><a href="/images/JPEG_example.jpg">JPEG_example.jpg</a><a href="/images/sample_1.png">sample_1.png</a><a href="/images/Sample_Scene_Balls.jpg">Sample_Scene_Balls.jpg</a></body></html>'
-    assert server.html_maker(b'webroot/images', b'/images') == test_response
+    assert server.html_maker('webroot/images', b'/images') == test_response
 
