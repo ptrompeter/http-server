@@ -33,6 +33,7 @@ def listen_to(server):
         print(message.decode('utf8'))
         try:
             body, content_type = resolve_uri(parse_request(message))
+            print()
             conn.sendall(response_ok())
             conn.sendall(content_type)
             conn.sendall(b'\r\n\r\n')
@@ -102,15 +103,15 @@ def resolve_uri(uri):
     return(target, content_type)
 
 def html_maker(req_path, uri):
-    anchors = b''
-    html_base = b'<!DOCTYPE html><html><body>{}</body></html>'
+    anchors = u''
+    html_base = u'<!DOCTYPE html><html><body>{}</body></html>'
     a_format = u'<a href="{root}/{file_name}">{file_name}</a>'
     for root, dirs, files in os.walk(req_path):
         for d in dirs:
-            anchors += a_format.format(root=uri.decode('utf8'), file_name=d).encode('utf8')
+            anchors += a_format.format(root=uri.decode('utf8'), file_name=d)
         for f in files:
-            anchors += a_format.format(root=uri.decode('utf8'), file_name=f).encode('utf-8')
-    return html_base.format(anchors)
+            anchors += a_format.format(root=uri.decode('utf8'), file_name=f)
+    return html_base.format(anchors).encode('utf8')
 
 
 def reply(conn, message):
