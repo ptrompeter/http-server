@@ -76,7 +76,6 @@ def parse_request(request):
 
 def resolve_uri(uri):
     req_path = RSC.format(uri.decode('utf8'))
-    print(req_path)
     try:
         if os.path.isdir(req_path):
             target = html_maker(req_path, uri)
@@ -105,12 +104,12 @@ def resolve_uri(uri):
 def html_maker(req_path, uri):
     anchors = b''
     html_base = b'<!DOCTYPE html><html><body>{}</body></html>'
-    a_format = b'<a href="{root}/{file_name}">{file_name}</a>'
+    a_format = u'<a href="{root}/{file_name}">{file_name}</a>'
     for root, dirs, files in os.walk(req_path):
         for d in dirs:
-            anchors += a_format.format(root=uri, file_name=d.encode('utf-8'))
+            anchors += a_format.format(root=uri.decode('utf8'), file_name=d).encode('utf8')
         for f in files:
-            anchors += a_format.format(root=uri, file_name=f.encode('utf-8'))
+            anchors += a_format.format(root=uri.decode('utf8'), file_name=f).encode('utf-8')
     return html_base.format(anchors)
 
 
