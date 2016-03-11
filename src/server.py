@@ -1,7 +1,11 @@
 # _*_ Coding: utf-8 _*_
 
 import socket
+import io
+import errno
+import os.path
 
+RSC = u'/webroot{}'
 
 def server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
@@ -50,6 +54,7 @@ def listen_to(server):
             quit()
 
 def parse_request(request):
+    """Parse request and validate"""
     req_list = request.splitlines()
     header_list = req_list[:req_list.index(b'')]
     if header_list[0][:3] != b'GET':
@@ -61,7 +66,36 @@ def parse_request(request):
             break
     else:
         raise NameError
-    return header_list[0][4:-9]
+    return header_list[0][4:-9].strip()
+
+
+def resolve_uri(uri):
+    req_path = RSC.format(uri.decode('utf8'))
+    print(req_path)
+    try:
+        if os.path.isdir(req_path):
+            target = html_maker(uri)
+            return (target, b'Content-Type: text/html')
+        f = io.open(req_path,'rb')
+        target = f.read()
+        f.close()
+    except IOError:
+        raise IOError
+    uri_suffix = uri[-index[::-1].index('.'):]
+    content_type = b'Content-Type: '
+    if uri_suffix == b'txt':
+        content_type += 'text/plain'
+    elif uri_suffix == b'jpg' or uri_suffix == b'.jpeg':
+        content_type += b'image/jpeg'
+    elif uri_suffix == b'html':
+        content_type += b'text/html'
+    elif uri_suffix == b'png':
+        content_type += b'image/png'
+    elif uri_suffix == b'py':
+        content_type += b'text/python'
+    else:
+        raise IOError
+    return(target, content_type)
 
 
 def reply(conn, message):
