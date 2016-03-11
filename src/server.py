@@ -33,8 +33,6 @@ def listen_to(server):
         print(message.decode('utf8'))
         try:
             body, content_type = resolve_uri(parse_request(message))
-            print(content_type)
-            print(body)
             conn.sendall(response_ok())
             conn.sendall(content_type)
             conn.sendall(b'\r\n\r\n')
@@ -42,7 +40,7 @@ def listen_to(server):
             conn.sendall(b'\r\n\r\n')
         except AttributeError:  # Bad Request
             conn.sendall(response_error(b'405', b'Method Not Allowed'))
-        except EnvironmentError:  # Wrong HTTP
+        except TypeError:  # Wrong HTTP
             conn.sendall(response_error(b'406', b'Not Acceptable'))
         except NameError:  # No Host
             conn.sendall(response_error(b'400', b'Bad Request'))
@@ -67,7 +65,7 @@ def parse_request(request):
     if header_list[0][:3] != b'GET':
         raise AttributeError
     if header_list[0][-8:] != b'HTTP/1.1':
-        raise EnvironmentError
+        raise TypeError
     for header in header_list[1:]:
         if header[:5] == b'Host:':
             break
@@ -77,16 +75,15 @@ def parse_request(request):
 
 
 def resolve_uri(uri):
-    print(uri)
     req_path = RSC.format(uri.decode('utf8'))
-    print(req_path)
     try:
+        #pdb.set_trace()
         if os.path.isdir(req_path):
             target = html_maker(req_path, uri)
+            print(target.decode('utf8'))
             return (target, b'Content-Type: text/html')
         f = io.open(req_path, 'rb')
         target = f.read()
-        print(target)
         f.close()
     except IOError:
         raise IOError
@@ -104,19 +101,19 @@ def resolve_uri(uri):
         content_type += b'text/python'
     else:
         raise IOError
-    print(target)
-    print(content_type)
     return(target, content_type)
 
 def html_maker(req_path, uri):
     anchors = u''
     html_base = u'<!DOCTYPE html><html><body>{}</body></html>'
-    a_format = u'<a href="{root}/{file_name}">{file_name}</a>'
+    d_format = u'<a href="{root}{file_name}">{file_name}</a>'
+    f_format = u'<a href="{root}/{file_name}">{file_name}</a>'
     for root, dirs, files in os.walk(req_path):
         for d in dirs:
-            anchors += a_format.format(root=uri.decode('utf-8'), file_name=d)
+            anchors += d_format.format(root=uri.decode('utf-8'), file_name=d)
         for f in files:
-            anchors += a_format.format(root=uri.decode('utf-8'), file_name=f)
+            anchors += f_format.format(root=uri.decode('utf-8'), file_name=f)
+    print(html_base.format(anchors))
     return html_base.format(anchors).encode('utf-8')
 
 
