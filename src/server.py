@@ -1,4 +1,4 @@
-# _*_ Coding: utf-8 _*_
+# _*_ coding: utf-8 _*_
 
 import socket
 import io
@@ -33,7 +33,8 @@ def listen_to(server):
         print(message.decode('utf8'))
         try:
             body, content_type = resolve_uri(parse_request(message))
-            print()
+            print(content_type)
+            print(body)
             conn.sendall(response_ok())
             conn.sendall(content_type)
             conn.sendall(b'\r\n\r\n')
@@ -76,13 +77,16 @@ def parse_request(request):
 
 
 def resolve_uri(uri):
+    print(uri)
     req_path = RSC.format(uri.decode('utf8'))
+    print(req_path)
     try:
         if os.path.isdir(req_path):
             target = html_maker(req_path, uri)
             return (target, b'Content-Type: text/html')
         f = io.open(req_path, 'rb')
         target = f.read()
+        print(target)
         f.close()
     except IOError:
         raise IOError
@@ -100,6 +104,8 @@ def resolve_uri(uri):
         content_type += b'text/python'
     else:
         raise IOError
+    print(target)
+    print(content_type)
     return(target, content_type)
 
 def html_maker(req_path, uri):
@@ -108,10 +114,10 @@ def html_maker(req_path, uri):
     a_format = u'<a href="{root}/{file_name}">{file_name}</a>'
     for root, dirs, files in os.walk(req_path):
         for d in dirs:
-            anchors += a_format.format(root=uri.decode('utf8'), file_name=d)
+            anchors += a_format.format(root=uri.decode('utf-8'), file_name=d)
         for f in files:
-            anchors += a_format.format(root=uri.decode('utf8'), file_name=f)
-    return html_base.format(anchors).encode('utf8')
+            anchors += a_format.format(root=uri.decode('utf-8'), file_name=f)
+    return html_base.format(anchors).encode('utf-8')
 
 
 def reply(conn, message):
