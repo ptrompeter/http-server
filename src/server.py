@@ -32,9 +32,11 @@ def listen_to(server):
                 message_complete = True
         print(message.decode('utf8'))
         try:
-            sending_message = parse_request(message)
+            body, content_type = resolve_uri(parse_request(message))
             conn.sendall(response_ok())
-            conn.sendall(sending_message)
+            conn.sendall(content_type)
+            conn.sendall(b'\r\n\r\n')
+            conn.sendall(body)
             conn.sendall(b'\r\n\r\n')
         except AttributeError:  # Bad Request
             conn.sendall(response_error(b'405', b'Method Not Allowed'))
@@ -42,6 +44,8 @@ def listen_to(server):
             conn.sendall(response_error(b'406', b'Not Acceptable'))
         except NameError:  # No Host
             conn.sendall(response_error(b'400', b'Bad Request'))
+        except IOError:  # Requested file not found.
+            conn.sendall(response_error(b'404', b'Resource Not Found'))
         except Exception:  # Any other error
             conn.sendall(response_error(b'500', b'Internal Server Error'))
         finally:
@@ -71,14 +75,13 @@ def parse_request(request):
 
 
 def resolve_uri(uri):
-    # pdb.set_trace()
     req_path = RSC.format(uri.decode('utf8'))
     print(req_path)
     try:
         if os.path.isdir(req_path):
-            target = html_maker(req_path)
+            target = html_maker(req_path, uri)
             return (target, b'Content-Type: text/html')
-        f = io.open(req_path,'rb')
+        f = io.open(req_path, 'rb')
         target = f.read()
         f.close()
     except IOError:
@@ -99,15 +102,15 @@ def resolve_uri(uri):
         raise IOError
     return(target, content_type)
 
-def html_maker(req_path):
-    files, dirs, some_other_thing = os.walk(req_path)
+def html_maker(req_path, uri):
     anchors = b''
     html_base = b'<!DOCTYPE html><html><body>{}</body></html>'
     a_format = b'<a href="{root}/{file_name}">{file_name}</a>'
-    for d in files[1]:
-        anchors += a_format.format(root = req_path, file_name = d.encode('utf-8'))
-    for f in files[2]:
-        anchors += a_format.format(root = req_path, file_name = f.encode('utf-8'))
+    for root, dirs, files in os.walk(req_path):
+        for d in dirs:
+            anchors += a_format.format(root=uri, file_name=d.encode('utf-8'))
+        for f in files:
+            anchors += a_format.format(root=uri, file_name=f.encode('utf-8'))
     return html_base.format(anchors)
 
 
@@ -117,7 +120,7 @@ def reply(conn, message):
 
 def response_ok():
     """return HTTP ok response."""
-    return b'HTTP/1.1 200 OK\r\n\r\n'
+    return b'HTTP/1.1 200 OK\r\n'
 
 
 def response_error(error_code, error_message):

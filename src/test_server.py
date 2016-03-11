@@ -10,12 +10,11 @@ b'Content-Type: image/jpeg',
 b'Content-Type: image/png',
 b'Content-Type: text/html',
 b'Content-Type: text/python',
-b'Content-Type: directory',
 ]
 
 
 USR_MESSAGES = [
-    b'GET sumjunkz HTTP/1.1\r\nHost:adfisojasdfiidfs\r\nDate:aifsuhdskdfhsdg\r\n\r\nasdfiojasdfjiopasdfpijo',
+    b'GET /sample.txt HTTP/1.1\r\nHost:adfisojasdfiidfs\r\nDate:aifsuhdskdfhsdg\r\n\r\nasdfiojasdfjiopasdfpijo',
     b'POST sumjunkz HTTP/1.1\r\nHost:asdfasdfasdf\r\n\r\n',
     b'GET sumjunkz HTTP/1.0\r\nHost:asdfasdfg\r\n\r\n',
     b'GET sumjunkz HTTP/1.1\r\nDate:ioersjfisogio\r\n\r\n'
@@ -35,7 +34,7 @@ def test_HTTP_response():
 
 #@pytest.mark.parametrize('a', USR_MESSAGES)
 def test_parse_good():
-    assert server.parse_request(USR_MESSAGES[0]) == b'sumjunkz'
+    assert server.parse_request(USR_MESSAGES[0]) == b'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nThis is a very simple text file.Just to show that we can serve it up.\r\n\r\n'
 
 
 def test_parse_post():
@@ -74,7 +73,7 @@ def test_resolve_uri_python():
 
 
 def test_resolve_uri_directory():
-    assert server.resolve_uri(b'/images')[1] == CONTENT_TYPES[5]
+    assert server.resolve_uri(b'/images')[1] == CONTENT_TYPES[3]
 
 
 def test_resolve_uri_bad():
@@ -83,10 +82,6 @@ def test_resolve_uri_bad():
 
 
 def test_html_maker():
-    test_response = b'<!DOCTYPE html><html><body>'
-    '<a href="webroot/images/JPEG_example.jpg>JPEG_example.jpg</a>'
-    '<a href="webroot/images/sample_1.png>sample_1.png</a>"'
-    '<a href="webroot/images/Sample_Scene_Balls.jpg>Sample_Scene_Balls.jpg</a>"'
-    '</body></hmtl>'
-    assert server.html_maker('webroot/images') == test_response
+    test_response = b'<!DOCTYPE html><html><body><a href="/images/JPEG_example.jpg">JPEG_example.jpg</a><a href="/images/sample_1.png">sample_1.png</a><a href="/images/Sample_Scene_Balls.jpg">Sample_Scene_Balls.jpg</a></body></html>'
+    assert server.html_maker('webroot/images', '/images') == test_response
 
