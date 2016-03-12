@@ -104,8 +104,8 @@ def resolve_uri(uri):
 def html_maker(req_path, uri):
     anchors = u''
     html_base = u'<!DOCTYPE html><html><body>{}</body></html>'
-    d_format = u'<a href="{root}{file_name}">{file_name}</a><br>'
-    f_format = u'<a href="{root}/{file_name}">{file_name}</a><br>'
+    d_format = u'<a href="{root}{file_name}/">{file_name}</a><br>'
+    f_format = u'<a href="{root}{file_name}">{file_name}</a><br>'
     for root, dirs, files in os.walk(req_path):
         for d in dirs:
             anchors += d_format.format(root=uri.decode('utf-8'), file_name=d)
