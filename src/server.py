@@ -30,24 +30,23 @@ def listen_to(server):
             message += part
             if len(part) < buffer_length:
                 message_complete = True
-        print(message.decode('utf8'))
         try:
             body, content_type = resolve_uri(parse_request(message))
-            conn.sendall(response_ok())
-            conn.sendall(content_type)
-            conn.sendall(b'\r\n\r\n')
-            conn.sendall(body)
-            conn.sendall(b'\r\n\r\n')
+            conn.sendall(response_ok() + content_type + b'\r\n\r\n' + body + b'\r\n\r\n')
+            # conn.sendall(content_type)
+            # conn.sendall(b'\r\n\r\n')
+            # conn.sendall(body)
+            # conn.sendall(b'\r\n\r\n')
         except AttributeError:  # Bad Request
-            conn.sendall(response_error(b'405', b'Method Not Allowed'))
+            conn.sendall(response_error(u'405', u'Method Not Allowed'))
         except TypeError:  # Wrong HTTP
-            conn.sendall(response_error(b'406', b'Not Acceptable'))
+            conn.sendall(response_error(u'406', u'Not Acceptable'))
         except NameError:  # No Host
-            conn.sendall(response_error(b'400', b'Bad Request'))
+            conn.sendall(response_error(u'400', u'Bad Request'))
         except IOError:  # Requested file not found.
-            conn.sendall(response_error(b'404', b'Resource Not Found'))
+            conn.sendall(response_error(u'404', u'Resource Not Found'))
         except Exception:  # Any other error
-            conn.sendall(response_error(b'500', b'Internal Server Error'))
+            conn.sendall(response_error(u'500', u'Internal Server Error'))
         finally:
             conn.close()
     except KeyboardInterrupt:
@@ -80,7 +79,6 @@ def resolve_uri(uri):
         #pdb.set_trace()
         if os.path.isdir(req_path):
             target = html_maker(req_path, uri)
-            print(target.decode('utf8'))
             return (target, b'Content-Type: text/html')
         f = io.open(req_path, 'rb')
         target = f.read()
@@ -106,14 +104,13 @@ def resolve_uri(uri):
 def html_maker(req_path, uri):
     anchors = u''
     html_base = u'<!DOCTYPE html><html><body>{}</body></html>'
-    d_format = u'<a href="{root}{file_name}">{file_name}</a>'
-    f_format = u'<a href="{root}/{file_name}">{file_name}</a>'
+    d_format = u'<a href="{root}{file_name}">{file_name}</a><br>'
+    f_format = u'<a href="{root}/{file_name}">{file_name}</a><br>'
     for root, dirs, files in os.walk(req_path):
         for d in dirs:
             anchors += d_format.format(root=uri.decode('utf-8'), file_name=d)
         for f in files:
             anchors += f_format.format(root=uri.decode('utf-8'), file_name=f)
-    print(html_base.format(anchors))
     return html_base.format(anchors).encode('utf-8')
 
 
@@ -128,7 +125,7 @@ def response_ok():
 
 def response_error(error_code, error_message):
     """return HTTP server error response."""
-    return b'HTTP/1.1 {} {}\r\n\r\n'.format(error_code, error_message)
+    return u'HTTP/1.1 {} {}\r\n\r\n'.format(error_code, error_message).encode('utf-8')
 
 
 if __name__ == '__main__':
