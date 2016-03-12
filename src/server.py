@@ -25,7 +25,7 @@ def listen_to(server):
         message = b""
         while not message_complete:
             part = conn.recv(buffer_length)
-            if part is '':
+            if part is b'':
                 message_complete = True
             message += part
             if len(part) < buffer_length:

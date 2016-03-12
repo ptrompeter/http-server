@@ -9,16 +9,18 @@ def client(message):
     client = socket.socket(*stream_info[:3])
     client.connect(stream_info[-1])
     client.sendall(message)
-    buffer_length = 8
+    buffer_length = 500
     message_complete = False
-    message = b''
+    message = client.recv(buffer_length)
+    '''
     while not message_complete:
         part = client.recv(buffer_length)
-        if part == '':
-                message_complete = True
+        if part == b'':
+            message_complete = True
         message += part
         if len(part) < buffer_length:
             message_complete = True
+    '''
     client.close()
     return message.decode('utf8')
 
