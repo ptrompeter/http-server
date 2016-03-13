@@ -1,26 +1,19 @@
-# _*_ coding: utf-8 _*_
+# _*_ Coding: utf-8 _*_
 
 import socket
-import io
-import pdb
+import sys
 import os.path
 import os
+import io
+import pdb
 
 RSC = u'webroot{}'
 
-def server():
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-    address = ('127.0.0.1', 5050)
-    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server.bind(address)
-    return server
 
-
-def listen_to(server):
-    try:
-        server.listen(1)
-        conn, addr = server.accept()
-        buffer_length = 8
+def asynch(conn, address):    
+    """Tell the StreamServer what to do with incoming data."""
+    try:       
+        buffer_length = 16
         message_complete = False
         message = b""
         while not message_complete:
@@ -33,10 +26,6 @@ def listen_to(server):
         try:
             body, content_type = resolve_uri(parse_request(message))
             conn.sendall(response_ok() + content_type + b'\r\n\r\n' + body + b'\r\n\r\n')
-            # conn.sendall(content_type)
-            # conn.sendall(b'\r\n\r\n')
-            # conn.sendall(body)
-            # conn.sendall(b'\r\n\r\n')
         except AttributeError:  # Bad Request
             conn.sendall(response_error(u'405', u'Method Not Allowed'))
         except TypeError:  # Wrong HTTP
@@ -57,6 +46,7 @@ def listen_to(server):
             server.close()
             quit()
 
+
 def parse_request(request):
     """Parse request and validate"""
     req_list = request.splitlines()
@@ -74,9 +64,9 @@ def parse_request(request):
 
 
 def resolve_uri(uri):
+    """Handle URI request and return appropriate result"""
     req_path = RSC.format(uri.decode('utf8'))
     try:
-        #pdb.set_trace()
         if os.path.isdir(req_path):
             target = html_maker(req_path, uri)
             return (target, b'Content-Type: text/html')
@@ -101,7 +91,9 @@ def resolve_uri(uri):
         raise IOError
     return(target, content_type)
 
+
 def html_maker(req_path, uri):
+    """Create an HTML page to map files in a requested directory."""
     anchors = u''
     html_base = u'<!DOCTYPE html><html><body>{}</body></html>'
     d_format = u'<a href="{root}{file_name}/">{file_name}</a><br>'
@@ -112,10 +104,6 @@ def html_maker(req_path, uri):
         for f in files:
             anchors += f_format.format(root=uri.decode('utf-8'), file_name=f)
     return html_base.format(anchors).encode('utf-8')
-
-
-def reply(conn, message):
-    conn.sendall(message.encode('utf8'))
 
 
 def response_ok():
@@ -129,5 +117,9 @@ def response_error(error_code, error_message):
 
 
 if __name__ == '__main__':
-    while True:
-        listen_to(server())
+    from gevent.server import StreamServer
+    from gevent.monkey import patch_all
+    patch_all()
+    server = StreamServer(('127.0.0.1', 5050), asynch)
+    print('Starting server on port 5050')
+    server.serve_forever()

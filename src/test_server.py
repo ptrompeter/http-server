@@ -27,9 +27,9 @@ def test_response_ok():
 
 def test_HTTP_response():
     assert client.client(USR_MESSAGES[0]) == u'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nThis is a very simple text file.\nJust to show that we can serve it up.\nIt is three lines long.\n\r\n\r\n'
-    #assert client.client(USR_MESSAGES[1]) == u'HTTP/1.1 405 Method Not Allowed\r\n\r\n'
-    #assert client.client(USR_MESSAGES[2]) == u'HTTP/1.1 406 Not Acceptable\r\n\r\n'
-    #assert client.client(USR_MESSAGES[3]) == u'HTTP/1.1 400 Bad Request\r\n\r\n'
+    assert client.client(USR_MESSAGES[1]) == u'HTTP/1.1 405 Method Not Allowed\r\n\r\n'
+    assert client.client(USR_MESSAGES[2]) == u'HTTP/1.1 406 Not Acceptable\r\n\r\n'
+    assert client.client(USR_MESSAGES[3]) == u'HTTP/1.1 400 Bad Request\r\n\r\n'
 
 #@pytest.mark.parametrize('a', USR_MESSAGES)
 def test_parse_good():
@@ -82,5 +82,5 @@ def test_resolve_uri_bad():
 
 def test_html_maker():
     test_response = b'<!DOCTYPE html><html><body><a href="/images/JPEG_example.jpg">JPEG_example.jpg</a><br><a href="/images/sample_1.png">sample_1.png</a><br><a href="/images/Sample_Scene_Balls.jpg">Sample_Scene_Balls.jpg</a><br></body></html>'
-    assert server.html_maker(u'webroot/images', b'/images') == test_response
+    assert server.html_maker(u'webroot/images', b'/images/') == test_response
 
